@@ -76,7 +76,10 @@ EOF
 dest=$home/.frpc
 install(){
     if [ ! -d $dest ];then
-        mkdir $dest
+        mkdir -p $dest
+    fi
+    if [ ! -d $home/.config/systemd/user ];then
+        mkdir -p $home/.config/systemd/user
     fi
     cp ./linux/frpc $dest
     cp frpc.ini $dest
