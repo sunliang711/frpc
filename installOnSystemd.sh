@@ -73,36 +73,38 @@ EOF
     exit 1
 }
 
-dest=$home/.frpc
+binDir=$home/.frpc
+serviceDir=$home/.config/systemd/user
+
 install(){
-    if [ ! -d $dest ];then
-        mkdir -p $dest
+    if [ ! -d $binDir ];then
+        mkdir -p $binDir || { echo "make $binDir error.";exit 1; }
     fi
-    if [ ! -d $home/.config/systemd/user ];then
-        mkdir -p $home/.config/systemd/user
+    if [ ! -d $serviceDir ];then
+        mkdir -p $serviceDir || { echo "make $serviceDir error.";exit 1; }
     fi
-    cp ./linux/frpc $dest
-    cp frpc.ini $dest
-    cat<<EOF>$home/.config/systemd/user/frpc.service
+    cp ./linux/frpc $binDir
+    cp frpc.ini $binDir
+    cat<<EOF>$serviceDir/frpc.service
 [Uint]
 Description=frpc service
 
 [Service]
 Type=simple
-ExecStart=$dest/.frpc/frpc -c $dest/.frpc/frpc.ini
+ExecStart=$binDir/.frpc/frpc -c $binDir/.frpc/frpc.ini
 Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
 EOF
-    echo "Edit $dest/.frpc/frpc.ini to config"
-    echo "Then systemctl --user start frpc"
+    echo "Edit ${green}$binDir/.frpc/frpc.ini${reset} to config"
+    echo "Then issue '${green}systemctl --user start frpc${reset}'"
 }
 
 uninstall(){
     systemctl --user stop frpc 2>/dev/null
-    rm -rf $dest
-    rm $home/.config/systemd/user/frpc.service
+    rm -rf $binDir || { echo "rm $binDir error.";exit 1; }
+    rm $serviceDir/frpc.service || { echo "rm $serviceDir/frpc.service error.";exit 1; }
 }
 
 cmd=$1
