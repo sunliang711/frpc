@@ -50,7 +50,7 @@ runAsRoot(){
     fi
 }
 
-case $(uname)in
+case $(uname) in
     Linux)
         ;;
     *)
