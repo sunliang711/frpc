@@ -92,7 +92,7 @@ Restart=on-failure
 [Install]
 WantedBy=multi-user.target
 EOF
-    echo "Edit ${green}$binDir/.frpc/frpc.ini${reset} to config"
+    echo "Edit ${green}$binDir/frpc.ini${reset} to config"
     echo "Then issue '${green}systemctl --user start frpc${reset}'"
 }
 
