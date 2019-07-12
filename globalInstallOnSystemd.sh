@@ -91,7 +91,7 @@ Description=frpc service
 
 [Service]
 Type=simple
-ExecStart=$binDir/.frpc/frpc -c $binDir/.frpc/frpc.ini
+ExecStart=$binDir/frpc -c $binDir/frpc.ini
 Restart=on-failure
 
 [Install]
