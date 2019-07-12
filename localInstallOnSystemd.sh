@@ -58,11 +58,6 @@ case $(uname)in
         exit 1
 esac
 
-if (($EUID!=0));then
-    echo "Need run as root"
-    exit 1
-fi
-
 usage(){
     cat<<EOF
 Usage: $(basename $0) cmd
