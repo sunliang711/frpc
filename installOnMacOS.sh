@@ -51,17 +51,12 @@ runAsRoot(){
 }
 
 case $(uname) in
-    Linux)
+    Darwin)
         ;;
     *)
-        echo "Only on systemd Linux version"
+        echo "Only on MacOS"
         exit 1
 esac
-
-if (($EUID!=0));then
-    echo "Need run as root"
-    exit 1
-fi
 
 usage(){
     cat<<EOF
@@ -73,8 +68,8 @@ EOF
     exit 1
 }
 
-binDir=/usr/local/frpc
-serviceDir=/etc/systemd/system
+binDir=$home/.frpc
+serviceDir=$home/Library/LaunchAgents
 
 install(){
     if [ ! -d $binDir ];then
@@ -83,29 +78,39 @@ install(){
     if [ ! -d $serviceDir ];then
         mkdir -p $serviceDir || { echo "make $serviceDir error.";exit 1; }
     fi
-    cp ./linux/frpc $binDir
+    cp ./Darwin/frpc $binDir
     cp frpc.ini $binDir
     cp frpc_full.ini $binDir
-    cat<<EOF>$serviceDir/frpc.service
-[Uint]
-Description=frpc service
-
-[Service]
-Type=simple
-ExecStart=$binDir/frpc -c $binDir/frpc.ini
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
+    cat<<EOF>$serviceDir/frpc.plist
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>frpc</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>$binDir/frpc</string>
+        <string>-c</string>
+        <string>$binDir/frpc.ini</string>
+    </array>
+    <key>StandardOutPath</key>
+    <string>/tmp/privoxy-1.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/privoxy-1.log</string>
+    <key>RunAtLoad</key>
+    <true/>
+</dict>
+</plist>
 EOF
     echo "Edit ${green}$binDir/frpc.ini${reset} to config"
-    echo "Then issue '${green}systemctl start frpc${reset}' as root"
 }
 
 uninstall(){
-    systemctl stop frpc 2>/dev/null
+    systemctl --user stop frpc 2>/dev/null
+    launchctl unload -w $serviceDir/frpc.plist
     rm -rf $binDir || { echo "rm $binDir error.";exit 1; }
-    rm $serviceDir/frpc.service || { echo "rm $serviceDir/frpc.service error.";exit 1; }
+    rm $serviceDir/frpc.plist || { echo "rm $serviceDir/frpc.plist error.";exit 1; }
 }
 
 cmd=$1

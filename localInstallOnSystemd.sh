@@ -80,6 +80,7 @@ install(){
     fi
     cp ./linux/frpc $binDir
     cp frpc.ini $binDir
+    cp frpc_full.ini $binDir
     cat<<EOF>$serviceDir/frpc.service
 [Uint]
 Description=frpc service
