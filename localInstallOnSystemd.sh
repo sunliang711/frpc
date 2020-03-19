@@ -88,7 +88,7 @@ Description=frpc service
 [Service]
 Type=simple
 ExecStart=$binDir/frpc -c $binDir/frpc.ini
-Restart=on-failure
+Restart=always
 
 [Install]
 WantedBy=multi-user.target
